@@ -30,10 +30,6 @@ public class DistanceService {
             throw new CityNotFoundException("City " + city2 + " not found");
         }
 
-        if ("test500".equalsIgnoreCase(city2)) {
-            throw new RuntimeException("Simulated internal server error for testing");
-        }
-
         double distance = calculateHaversine(c1.getLatitude(), c1.getLongitude(), c2.getLatitude(), c2.getLongitude());
         return new DistanceResponse(city1, city2, distance, "km");
     }
@@ -47,8 +43,6 @@ public class DistanceService {
                         return calculateDistance(city1, city2);
                     } catch (CityNotFoundException e) {
                         return new DistanceResponse(city1, city2, -1, "km");
-                    } catch (Exception e) {
-                        return new DistanceResponse(city1, city2, -2, "km");
                     }
                 })
                 .collect(Collectors.toList());

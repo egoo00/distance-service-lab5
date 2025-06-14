@@ -10,12 +10,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 public class DistanceServiceTest {
+
     @Mock
     private CityRepository cityRepository;
 
@@ -52,21 +54,7 @@ public class DistanceServiceTest {
         when(cityRepository.findByName("Минск")).thenReturn(Optional.empty());
         when(geocodingService.getCity("Минск")).thenReturn(null);
 
-        assertThrows(CityNotFoundException.class, () -> {
-            distanceService.calculateDistance("Минск", "Варшава");
-        });
-    }
-
-    @Test
-    void calculateDistance_Test500_ThrowsException() {
-        City minsk = new City("Минск", 53.9, 27.5667);
-        when(cityRepository.findByName("Минск")).thenReturn(Optional.of(minsk));
-        when(cityRepository.findByName("test500")).thenReturn(Optional.empty());
-        when(geocodingService.getCity("test500")).thenReturn(null);
-
-        assertThrows(RuntimeException.class, () -> {
-            distanceService.calculateDistance("Минск", "test500");
-        });
+        assertThrows(CityNotFoundException.class, () -> distanceService.calculateDistance("Минск", "Варшава"));
     }
 
     @Test

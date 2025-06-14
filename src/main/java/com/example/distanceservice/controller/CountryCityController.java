@@ -13,19 +13,21 @@ import java.util.List;
 @RestController
 public class CountryCityController {
 
-    @Autowired
-    private CityRepository cityRepository;
+    private final CityRepository cityRepository;
+    private final SimpleCache simpleCache;
 
     @Autowired
-    private SimpleCache simpleCache;
+    public CountryCityController(CityRepository cityRepository, SimpleCache simpleCache) {
+        this.cityRepository = cityRepository;
+        this.simpleCache = simpleCache;
+    }
 
     @GetMapping("/api/cities-by-country")
     public List<City> getCitiesByCountry(@RequestParam String countryName) {
         String cacheKey = "cities_" + countryName;
-        List<City> cachedCities = (List<City>) simpleCache.get(cacheKey);
-
-        if (cachedCities != null) {
-            return cachedCities;
+        Object cached = simpleCache.get(cacheKey);
+        if (cached instanceof List<?> cachedCities) {
+            return (List<City>) cachedCities;
         }
 
         List<City> cities = cityRepository.findCitiesByCountryName(countryName);
@@ -36,10 +38,9 @@ public class CountryCityController {
     @GetMapping("/api/cities-by-country-native")
     public List<City> getCitiesByCountryNative(@RequestParam String countryName) {
         String cacheKey = "cities_native_" + countryName;
-        List<City> cachedCities = (List<City>) simpleCache.get(cacheKey);
-
-        if (cachedCities != null) {
-            return cachedCities;
+        Object cached = simpleCache.get(cacheKey);
+        if (cached instanceof List<?> cachedCities) {
+            return (List<City>) cachedCities;
         }
 
         List<City> cities = cityRepository.findCitiesByCountryNameNative(countryName);
