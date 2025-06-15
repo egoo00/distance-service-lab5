@@ -7,6 +7,8 @@ import com.example.distanceservice.repository.CountryRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
+
 @Component
 public class DataLoader implements CommandLineRunner {
     private final CityRepository cityRepository;
@@ -23,17 +25,10 @@ public class DataLoader implements CommandLineRunner {
         russia.setName("Russia");
         countryRepository.save(russia);
 
-        City moscow = new City();
-        moscow.setName("Moscow");
-        moscow.setLatitude(55.7558);
-        moscow.setLongitude(37.6173);
-        moscow.setCountry(russia);
+        City moscow = new City("Moscow", 55.7558, 37.6173, russia, Collections.emptyList());
         cityRepository.save(moscow);
 
-        City london = new City();
-        london.setName("London");
-        london.setLatitude(51.5074);
-        london.setLongitude(-0.1278);
+        City london = new City("London", 51.5074, -0.1278, null, Collections.emptyList());
         cityRepository.save(london);
     }
 }

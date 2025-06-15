@@ -30,7 +30,7 @@ public class CountryCityController {
             return (List<City>) cachedCities;
         }
 
-        List<City> cities = cityRepository.findCitiesByCountryName(countryName);
+        List<City> cities = cityRepository.findByCountryName(countryName);
         simpleCache.put(cacheKey, cities);
         return cities;
     }
@@ -43,7 +43,7 @@ public class CountryCityController {
             return (List<City>) cachedCities;
         }
 
-        List<City> cities = cityRepository.findCitiesByCountryNameNative(countryName);
+        List<City> cities = cityRepository.findByCountryNameNative(countryName);
         simpleCache.put(cacheKey, cities);
         return cities;
     }

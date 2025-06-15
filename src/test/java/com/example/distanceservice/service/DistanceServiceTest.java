@@ -34,8 +34,8 @@ public class DistanceServiceTest {
 
     @Test
     void calculateDistance_ValidCities_ReturnsDistance() {
-        City minsk = new City("Минск", 53.9, 27.5667);
-        City warsaw = new City("Варшава", 52.2297, 21.0122);
+        City minsk = new City("Минск", 53.9, 27.5667, null, null);
+        City warsaw = new City("Варшава", 52.2297, 21.0122, null, null);
 
         when(cityRepository.findByName("Минск")).thenReturn(Optional.of(minsk));
         when(cityRepository.findByName("Варшава")).thenReturn(Optional.of(warsaw));
@@ -59,8 +59,8 @@ public class DistanceServiceTest {
 
     @Test
     void calculateBulkDistances_ValidPairs_ReturnsResponses() {
-        City minsk = new City("Минск", 53.9, 27.5667);
-        City warsaw = new City("Варшава", 52.2297, 21.0122);
+        City minsk = new City("Минск", 53.9, 27.5667, null, null);
+        City warsaw = new City("Варшава", 52.2297, 21.0122, null, null);
 
         when(cityRepository.findByName("Минск")).thenReturn(Optional.of(minsk));
         when(cityRepository.findByName("Варшава")).thenReturn(Optional.of(warsaw));
@@ -77,7 +77,7 @@ public class DistanceServiceTest {
     void calculateBulkDistances_CityNotFound_ReturnsNegativeDistance() {
         when(cityRepository.findByName("Минск")).thenReturn(Optional.empty());
         when(geocodingService.getCity("Минск")).thenReturn(null);
-        when(cityRepository.findByName("Варшава")).thenReturn(Optional.of(new City("Варшава", 52.2297, 21.0122)));
+        when(cityRepository.findByName("Варшава")).thenReturn(Optional.of(new City("Варшава", 52.2297, 21.0122, null, null)));
 
         List<String[]> pairs = List.of(new String[]{"Минск", "Варшава"});
         List<DistanceResponse> responses = distanceService.calculateBulkDistances(pairs);
@@ -85,5 +85,14 @@ public class DistanceServiceTest {
         assertNotNull(responses);
         assertEquals(1, responses.size());
         assertEquals(-1, responses.get(0).getDistance());
+    }
+
+    @Test
+    void calculateBulkDistances_EmptyPairs_ReturnsEmptyList() {
+        List<String[]> pairs = List.of();
+        List<DistanceResponse> responses = distanceService.calculateBulkDistances(pairs);
+
+        assertNotNull(responses);
+        assertTrue(responses.isEmpty());
     }
 }
