@@ -1,13 +1,13 @@
 package com.example.distanceservice.entity;
 
 public class Distance {
-    private String id; // Например, комбинация fromCity и toCity
+    private String id; 
     private String fromCity;
     private String toCity;
     private double distance;
     private String unit;
 
-    // Конструкторы
+
     public Distance() {}
     public Distance(String id, String fromCity, String toCity, double distance, String unit) {
         this.id = id;
@@ -17,7 +17,7 @@ public class Distance {
         this.unit = unit;
     }
 
-    // Геттеры и сеттеры
+
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
     public String getFromCity() { return fromCity; }
