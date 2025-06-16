@@ -1,38 +1,39 @@
 package com.example.distanceservice.controller;
 
-import com.example.distanceservice.entity.Country;
-import com.example.distanceservice.service.CountryService;
+import com.example.distanceservice.dto.DistanceResponse;
+import com.example.distanceservice.service.DistanceService;
+import com.example.distanceservice.util.RequestCounter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/countries")
-public class CountryController {
-    private final CountryService countryService;
+@RequestMapping("/api")
+public class DistanceController {
 
-    public CountryController(CountryService countryService) {
-        this.countryService = countryService;
+    private final DistanceService distanceService;
+    private final RequestCounter requestCounter;
+
+    @Autowired
+    public DistanceController(DistanceService distanceService, RequestCounter requestCounter) {
+        this.distanceService = distanceService;
+        this.requestCounter = requestCounter;
     }
 
-    @GetMapping
-    public List<Country> getAllCountries() {
-        return countryService.getAllCountries();
+    @GetMapping("/distance")
+    public DistanceResponse getDistance(@RequestParam String from, @RequestParam String to) {
+        return distanceService.calculateDistance(from, to);
     }
 
-    @GetMapping("/{id}")
-    public Optional<Country> getCountryById(@PathVariable Long id) {
-        return countryService.getCountryById(id);
+    @PostMapping("/distances/bulk")
+    public List<DistanceResponse> getBulkDistances(@RequestBody List<String[]> cityPairs) {
+        return distanceService.calculateBulkDistances(cityPairs);
     }
 
-    @PostMapping
-    public Country saveCountry(@RequestBody Country country) {
-        return countryService.saveCountry(country);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteCountry(@PathVariable Long id) {
-        countryService.deleteCountry(id);
+    @GetMapping("/counter")
+    public int getRequestCount() {
+        return requestCounter.getCount();
     }
 }
