@@ -9,8 +9,7 @@ import java.util.Map;
 @Component
 public class SimpleCache {
 
-    // Ключи в формате "cities_<countryName>" уникальны, что минимизирует коллизии.
-    // String использует свои реализации equals() и hashCode(), обеспечивая корректное сравнение.
+  
     private final Map<String, List<?>> cache = new HashMap<>();
 
     public void put(String key, List<?> value) {
