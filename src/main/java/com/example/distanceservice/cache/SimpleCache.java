@@ -8,8 +8,8 @@ import java.util.Map;
 
 @Component
 public class SimpleCache {
+    private static final String CACHE_TYPE = "list";
 
-  
     private final Map<String, List<?>> cache = new HashMap<>();
 
     public void put(String key, List<?> value) {
