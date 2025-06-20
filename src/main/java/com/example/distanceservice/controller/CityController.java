@@ -1,4 +1,3 @@
-
 package com.example.distanceservice.controller;
 
 import com.example.distanceservice.entity.City;
@@ -11,11 +10,12 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/cities")
 public class CityController {
+    private static final String API_PATH = "/api/cities";
+
     private final CityService cityService;
 
     public CityController(CityService cityService) {
         this.cityService = cityService;
-        
     }
 
     @GetMapping
