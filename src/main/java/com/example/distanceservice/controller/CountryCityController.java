@@ -11,6 +11,9 @@ import java.util.List;
 
 @RestController
 public class CountryCityController {
+    private static final String API_PATH_CITIES_BY_COUNTRY = "/api/cities-by-country";
+    private static final String API_PATH_CITIES_BY_COUNTRY_NATIVE = "/api/cities-by-country-native";
+
     private final CountryCityService countryCityService;
 
     @Autowired
@@ -18,12 +21,12 @@ public class CountryCityController {
         this.countryCityService = countryCityService;
     }
 
-    @GetMapping("/api/cities-by-country")
+    @GetMapping(API_PATH_CITIES_BY_COUNTRY)
     public List<City> getCitiesByCountry(@RequestParam String countryName) {
         return countryCityService.getCitiesByCountry(countryName);
     }
 
-    @GetMapping("/api/cities-by-country-native")
+    @GetMapping(API_PATH_CITIES_BY_COUNTRY_NATIVE)
     public List<City> getCitiesByCountryNative(@RequestParam String countryName) {
         return countryCityService.getCitiesByCountryNative(countryName);
     }
