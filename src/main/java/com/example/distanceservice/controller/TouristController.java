@@ -10,9 +10,10 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/api/tourists")
 public class TouristController {
+    private static final String API_PATH = "/api/tourists";
+
     private final TouristService touristService;
 
-    
     public TouristController(TouristService touristService) {
         this.touristService = touristService;
     }
