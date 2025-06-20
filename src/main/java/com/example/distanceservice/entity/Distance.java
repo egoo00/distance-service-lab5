@@ -1,12 +1,11 @@
 package com.example.distanceservice.entity;
 
 public class Distance {
-    private String id; 
+    private String id;
     private String fromCity;
     private String toCity;
     private double distance;
     private String unit;
-
 
     public Distance() {}
     public Distance(String id, String fromCity, String toCity, double distance, String unit) {
@@ -16,7 +15,6 @@ public class Distance {
         this.distance = distance;
         this.unit = unit;
     }
-
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
