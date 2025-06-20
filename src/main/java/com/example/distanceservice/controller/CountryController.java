@@ -1,39 +1,42 @@
 package com.example.distanceservice.controller;
 
-import com.example.distanceservice.dto.DistanceResponse;
-import com.example.distanceservice.service.DistanceService;
-import com.example.distanceservice.util.RequestCounter;
+import com.example.distanceservice.entity.Country;
+import com.example.distanceservice.service.CountryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-
 import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/api")
-public class DistanceController {
+@RequestMapping("/api/countries")
+public class CountryController {
+    private static final String API_PATH = "/api/countries";
 
-    private final DistanceService distanceService;
-    private final RequestCounter requestCounter;
+    private final CountryService countryService;
 
     @Autowired
-    public DistanceController(DistanceService distanceService, RequestCounter requestCounter) {
-        this.distanceService = distanceService;
-        this.requestCounter = requestCounter;
+    public CountryController(CountryService countryService) {
+        this.countryService = countryService;
     }
 
-    @GetMapping("/distance")
-    public DistanceResponse getDistance(@RequestParam String from, @RequestParam String to) {
-        return distanceService.calculateDistance(from, to);
+    @GetMapping
+    public List<Country> getAllCountries() {
+        return countryService.getAllCountries();
     }
 
-    @PostMapping("/distances/bulk")
-    public List<DistanceResponse> getBulkDistances(@RequestBody List<String[]> cityPairs) {
-        return distanceService.calculateBulkDistances(cityPairs);
+    @GetMapping("/{id}")
+    public Optional<Country> getCountryById(@PathVariable Long id) {
+        return countryService.getCountryById(id);
     }
 
-    @GetMapping("/counter")
-    public int getRequestCount() {
-        return requestCounter.getCount();
+    @PostMapping
+    public Country saveCountry(@RequestBody Country country) {
+        return countryService.saveCountry(country);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteCountry(@PathVariable Long id) {
+        countryService.deleteCountry(id);
     }
 }
