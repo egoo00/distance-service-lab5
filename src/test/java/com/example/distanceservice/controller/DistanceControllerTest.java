@@ -2,13 +2,11 @@ package com.example.distanceservice.controller;
 
 import com.example.distanceservice.dto.DistanceResponse;
 import com.example.distanceservice.service.DistanceService;
-import com.example.distanceservice.util.RequestCounter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.ResponseEntity;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,9 +19,6 @@ public class DistanceControllerTest {
 
     @Mock
     private DistanceService distanceService;
-
-    @Mock
-    private RequestCounter requestCounter;
 
     @InjectMocks
     private DistanceController distanceController;
@@ -38,10 +33,10 @@ public class DistanceControllerTest {
         DistanceResponse response = new DistanceResponse(CITY_MINSK, CITY_WARSAW, EXPECTED_DISTANCE_MINSK_WARSAW, UNIT_KM);
         when(distanceService.calculateDistance(CITY_MINSK, CITY_WARSAW)).thenReturn(response);
 
-        ResponseEntity<DistanceResponse> result = (ResponseEntity<DistanceResponse>) (Object) distanceController.getDistance(CITY_MINSK, CITY_WARSAW);
+        DistanceResponse result = distanceController.getDistance(CITY_MINSK, CITY_WARSAW);
 
-        assertNotNull(result.getBody());
-        assertEquals(response, result.getBody());
+        assertNotNull(result);
+        assertEquals(response, result);
         verify(distanceService).calculateDistance(CITY_MINSK, CITY_WARSAW);
     }
 
@@ -51,21 +46,20 @@ public class DistanceControllerTest {
         List<DistanceResponse> responses = Collections.singletonList(response);
         when(distanceService.calculateBulkDistances(anyList())).thenReturn(responses);
 
-        ResponseEntity<List<DistanceResponse>> result = (ResponseEntity<List<DistanceResponse>>) (Object) distanceController.getBulkDistances(Collections.singletonList(new String[]{CITY_MINSK, CITY_WARSAW}));
+        List<DistanceResponse> result = distanceController.getBulkDistances(Collections.singletonList(new String[]{CITY_MINSK, CITY_WARSAW}));
 
-        assertNotNull(result.getBody());
-        assertEquals(1, result.getBody().size());
+        assertNotNull(result);
+        assertEquals(1, result.size());
         verify(distanceService).calculateBulkDistances(anyList());
     }
 
     @Test
     void testGetRequestCount_ReturnsCount() {
-        when(requestCounter.getCount()).thenReturn(10);
+        when(distanceService.getRequestCount()).thenReturn(10);
 
-        ResponseEntity<Integer> result = (ResponseEntity<Integer>) (Object) distanceController.getRequestCount();
+        int result = distanceController.getRequestCount();
 
-        assertNotNull(result.getBody());
-        assertEquals(10, result.getBody());
-        verify(requestCounter).getCount();
+        assertEquals(10, result);
+        verify(distanceService).getRequestCount();
     }
 }
