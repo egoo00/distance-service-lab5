@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.ResponseEntity;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static com.example.distanceservice.TestConstants.*;
@@ -24,9 +24,6 @@ public class CityControllerTest {
     @InjectMocks
     private CityController cityController;
 
-
-
-    
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
@@ -34,44 +31,44 @@ public class CityControllerTest {
 
     @Test
     void testGetAllCities_ReturnsList() {
-        City city = new City(CITY_MINSK, MINSK_LAT, MINSK_LON);
+        City city = new City(CITY_MINSK, MINSK_LAT, MINSK_LON, null, Collections.emptyList());
         when(cityService.getAllCities()).thenReturn(Collections.singletonList(city));
 
-        ResponseEntity<List<City>> response = (ResponseEntity<List<City>>) (Object) cityController.getAllCities();
+        List<City> response = cityController.getAllCities();
 
-        assertNotNull(response.getBody());
-        assertEquals(1, response.getBody().size());
+        assertNotNull(response);
+        assertEquals(1, response.size());
         verify(cityService).getAllCities();
     }
 
     @Test
     void testGetCityById_Exists_ReturnsCity() {
-        City city = new City(CITY_MINSK, MINSK_LAT, MINSK_LON);
-        when(cityService.getCityById(1L)).thenReturn(Optional.of(city));
+        City city = new City(CITY_MINSK, MINSK_LAT, MINSK_LON, null, Collections.emptyList());
+        when(cityService.getCityById(CITY_MINSK)).thenReturn(Optional.of(city));
 
-        ResponseEntity<Optional<City>> response = (ResponseEntity<Optional<City>>) (Object) cityController.getCityById(1L);
+        Optional<City> response = cityController.getCityById(CITY_MINSK);
 
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody().isPresent());
-        verify(cityService).getCityById(1L);
+        assertNotNull(response);
+        assertTrue(response.isPresent());
+        verify(cityService).getCityById(CITY_MINSK);
     }
 
     @Test
     void testSaveCity_ReturnsSavedCity() {
-        City city = new City(CITY_MINSK, MINSK_LAT, MINSK_LON);
+        City city = new City(CITY_MINSK, MINSK_LAT, MINSK_LON, null, Collections.emptyList());
         when(cityService.saveCity(city)).thenReturn(city);
 
-        ResponseEntity<City> response = (ResponseEntity<City>) (Object) cityController.saveCity(city);
+        City response = cityController.saveCity(city);
 
-        assertNotNull(response.getBody());
-        assertEquals(city, response.getBody());
+        assertNotNull(response);
+        assertEquals(city, response);
         verify(cityService).saveCity(city);
     }
 
     @Test
     void testDeleteCity_CallsService() {
-        cityController.deleteCity(1L);
+        cityController.deleteCity(CITY_MINSK);
 
-        verify(cityService).deleteCity(1L);
+        verify(cityService).deleteCity(CITY_MINSK);
     }
 }
