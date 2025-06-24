@@ -39,3 +39,4 @@ public class DataLoader implements CommandLineRunner {
         cityRepository.save(london);
     }
 }
+
