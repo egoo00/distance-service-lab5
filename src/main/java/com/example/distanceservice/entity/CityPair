@@ -1,0 +1,26 @@
+package com.example.distanceservice.entity;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToOne;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@Getter
+@Setter
+@NoArgsConstructor
+public class CityPair {
+    @Id
+    private String id;
+
+    @ManyToOne
+    private City city1;
+
+    @ManyToOne
+    private City city2;
+
+    private double distance;
+    private String unit;
+}
