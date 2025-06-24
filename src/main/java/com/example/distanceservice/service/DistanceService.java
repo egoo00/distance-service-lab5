@@ -5,32 +5,31 @@ import com.example.distanceservice.entity.City;
 import com.example.distanceservice.entity.CityPair;
 import com.example.distanceservice.exception.CityNotFoundException;
 import com.example.distanceservice.repository.CityRepository;
-import com.example.distanceservice.service.RequestCounter;
 import com.example.distanceservice.cache.SimpleCache;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
 public class DistanceService {
+    public static final String CACHE_KEY_DISTANCE = "distance_";
+
     private final CityRepository cityRepository;
     private final GeocodingService geocodingService;
-    private final RequestCounter requestCounter;
     private final SimpleCache simpleCache;
 
     @Autowired
-    public DistanceService(CityRepository cityRepository, GeocodingService geocodingService, RequestCounter requestCounter, SimpleCache simpleCache) {
+    public DistanceService(CityRepository cityRepository, GeocodingService geocodingService, SimpleCache simpleCache) {
         this.cityRepository = cityRepository;
         this.geocodingService = geocodingService;
-        this.requestCounter = requestCounter;
         this.simpleCache = simpleCache;
     }
 
     public DistanceResponse calculateDistance(String city1Name, String city2Name) {
-        requestCounter.increment();
-        String cacheKey = "distance_" + city1Name.toLowerCase() + "_" + city2Name.toLowerCase();
+        String cacheKey = CACHE_KEY_DISTANCE + city1Name.toLowerCase() + "_" + city2Name.toLowerCase();
         @SuppressWarnings("unchecked")
         DistanceResponse cachedResponse = (DistanceResponse) simpleCache.get(cacheKey);
         if (cachedResponse != null) {
@@ -46,6 +45,7 @@ public class DistanceService {
         }
         double distance = calculateHaversine(city1.getLatitude(), city1.getLongitude(), city2.getLatitude(), city2.getLongitude());
         CityPair cityPair = new CityPair();
+        cityPair.setId(UUID.randomUUID().toString());
         cityPair.setCity1(city1);
         cityPair.setCity2(city2);
         cityPair.setDistance(distance);
