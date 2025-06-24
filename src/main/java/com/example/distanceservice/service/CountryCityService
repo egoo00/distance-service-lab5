@@ -1,1 +1,40 @@
+package com.example.distanceservice.service;
 
+import com.example.distanceservice.entity.City;
+import com.example.distanceservice.repository.CityRepository;
+import com.example.distanceservice.cache.SimpleCache;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
+public class CountryCityService {
+    private final CityRepository cityRepository;
+    private final SimpleCache simpleCache;
+
+    @Autowired
+    public CountryCityService(CityRepository cityRepository, SimpleCache simpleCache) {
+        this.cityRepository = cityRepository;
+        this.simpleCache = simpleCache;
+    }
+
+    public List<City> getCitiesByCountry(String countryName) {
+        String cacheKey = "cities_by_country_" + countryName.toLowerCase();
+        @SuppressWarnings("unchecked")
+        List<City> cachedCities = (List<City>) simpleCache.get(cacheKey);
+        if (cachedCities != null) {
+            return cachedCities;
+        }
+        List<City> cities = cityRepository.findAll().stream()
+                .filter(city -> city.getCountry() != null && city.getCountry().getName().equalsIgnoreCase(countryName))
+                .collect(Collectors.toList());
+        simpleCache.put(cacheKey, cities);
+        return cities;
+    }
+
+    public List<City> getCitiesByCountryNative(String countryName) {
+        return getCitiesByCountry(countryName);
+    }
+}
