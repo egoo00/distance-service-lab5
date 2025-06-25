@@ -10,9 +10,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
-import static com.example.distanceservice.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -33,80 +33,74 @@ public class CityServiceTest {
     }
 
     @Test
-    void testGetAllCities_Cached_ReturnsCached() {
-        City city = new City(CITY_MINSK, MINSK_LAT, MINSK_LON);
-        @SuppressWarnings("unchecked")
-        List<City> cachedCities = Collections.singletonList(city);
-        when(simpleCache.get(CityService.CACHE_KEY_ALL_CITIES)).thenReturn(cachedCities);
-
-        List<City> result = cityService.getAllCities();
-
-        assertNotNull(result);
-        assertEquals(cachedCities, result);
-        verifyNoInteractions(cityRepository);
-    }
-
-    @Test
-    void testGetAllCities_NotCached_ReturnsFromRepo() {
-        City city = new City(CITY_MINSK, MINSK_LAT, MINSK_LON);
-        List<City> cities = Collections.singletonList(city);
-        when(cityRepository.findAll()).thenReturn(cities);
-        when(simpleCache.get(CityService.CACHE_KEY_ALL_CITIES)).thenReturn(null);
+    void shouldReturnCachedWhenGetAllCitiesCached() {
+        List<City> cities = Collections.emptyList();
+        when(simpleCache.get("all_cities")).thenReturn(cities);
 
         List<City> result = cityService.getAllCities();
 
         assertNotNull(result);
         assertEquals(cities, result);
-        verify(simpleCache).put(CityService.CACHE_KEY_ALL_CITIES, cities);
-    }
-
-    @Test
-    void testGetCityById_Cached_ReturnsCached() {
-        City city = new City(CITY_MINSK, MINSK_LAT, MINSK_LON);
-        Optional<City> cachedCity = Optional.of(city);
-        when(simpleCache.get(CityService.CACHE_KEY_CITY + 1L)).thenReturn(cachedCity);
-
-        Optional<City> result = cityService.getCityById(1L);
-
-        assertNotNull(result);
-        assertEquals(cachedCity, result);
         verifyNoInteractions(cityRepository);
     }
 
     @Test
-    void testGetCityById_NotCached_ReturnsFromRepo() {
-        City city = new City(CITY_MINSK, MINSK_LAT, MINSK_LON);
-        Optional<City> optionalCity = Optional.of(city);
-        when(cityRepository.findById(1L)).thenReturn(optionalCity);
-        when(simpleCache.get(CityService.CACHE_KEY_CITY + 1L)).thenReturn(null);
+    void shouldReturnFromRepoWhenGetAllCitiesNotCached() {
+        List<City> cities = Collections.emptyList();
+        when(cityRepository.findAll()).thenReturn(cities);
+        when(simpleCache.get("all_cities")).thenReturn(null);
 
-        Optional<City> result = cityService.getCityById(1L);
+        List<City> result = cityService.getAllCities();
 
         assertNotNull(result);
-        assertEquals(optionalCity, result);
-        verify(simpleCache).put(CityService.CACHE_KEY_CITY + 1L, optionalCity);
+        assertEquals(cities, result);
+        verify(simpleCache).put("all_cities", cities);
     }
 
     @Test
-    void testSaveCity_UpdatesCache() {
-        City city = new City(CITY_MINSK, MINSK_LAT, MINSK_LON);
-        City savedCity = new City(CITY_MINSK, MINSK_LAT, MINSK_LON);
-        when(cityRepository.save(city)).thenReturn(savedCity);
+    void shouldReturnCachedWhenGetCityByIdCached() {
+        Optional<City> city = Optional.empty();
+        when(simpleCache.get("city_id")).thenReturn(city);
+
+        Optional<City> result = cityService.getCityById("id");
+
+        assertNotNull(result);
+        assertEquals(city, result);
+        verifyNoInteractions(cityRepository);
+    }
+
+    @Test
+    void shouldReturnFromRepoWhenGetCityByIdNotCached() {
+        Optional<City> city = Optional.empty();
+        when(cityRepository.findById("id")).thenReturn(city);
+        when(simpleCache.get("city_id")).thenReturn(null);
+
+        Optional<City> result = cityService.getCityById("id");
+
+        assertNotNull(result);
+        assertEquals(city, result);
+        verify(simpleCache).put("city_id", city);
+    }
+
+    @Test
+    void shouldReturnSavedCityWhenSaveCity() {
+        City city = mock(City.class);
+        when(cityRepository.save(any(City.class))).thenReturn(city);
 
         City result = cityService.saveCity(city);
 
         assertNotNull(result);
-        assertEquals(savedCity, result);
-        verify(simpleCache).put(CityService.CACHE_KEY_ALL_CITIES, null);
-        verify(simpleCache).put(CityService.CACHE_KEY_CITY + savedCity.getId(), savedCity);
+        assertEquals(city, result);
+        verify(simpleCache).put("all_cities", null);
+        verify(simpleCache).put("city_" + city.getName(), city);
     }
 
     @Test
-    void testDeleteCity_UpdatesCache() {
-        cityService.deleteCity(1L);
+    void shouldUpdateCacheWhenDeleteCity() {
+        cityService.deleteCity("id");
 
-        verify(cityRepository).deleteById(1L);
-        verify(simpleCache).put(CityService.CACHE_KEY_ALL_CITIES, null);
-        verify(simpleCache).put(CityService.CACHE_KEY_CITY + 1L, null);
+        verify(cityRepository).deleteById("id");
+        verify(simpleCache).put("all_cities", null);
+        verify(simpleCache).put("city_id", null);
     }
 }
