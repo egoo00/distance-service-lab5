@@ -10,9 +10,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
-import static com.example.distanceservice.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -33,89 +33,74 @@ public class TouristServiceTest {
     }
 
     @Test
-    void testGetAllTourists_Cached_ReturnsCached() {
-        Tourist tourist = new Tourist();
-        tourist.setName("John");
-        @SuppressWarnings("unchecked")
-        List<Tourist> cachedTourists = Collections.singletonList(tourist);
-        when(simpleCache.get(TouristService.CACHE_KEY_ALL_TOURISTS)).thenReturn(cachedTourists);
-
-        List<Tourist> result = touristService.getAllTourists();
-
-        assertNotNull(result);
-        assertEquals(cachedTourists, result);
-        verifyNoInteractions(touristRepository);
-    }
-
-    @Test
-    void testGetAllTourists_NotCached_ReturnsFromRepo() {
-        Tourist tourist = new Tourist();
-        tourist.setName("John");
-        List<Tourist> tourists = Collections.singletonList(tourist);
-        when(touristRepository.findAll()).thenReturn(tourists);
-        when(simpleCache.get(TouristService.CACHE_KEY_ALL_TOURISTS)).thenReturn(null);
+    void shouldReturnCachedWhenGetAllTouristsCached() {
+        List<Tourist> tourists = Collections.emptyList();
+        when(simpleCache.get("all_tourists")).thenReturn(tourists);
 
         List<Tourist> result = touristService.getAllTourists();
 
         assertNotNull(result);
         assertEquals(tourists, result);
-        verify(simpleCache).put(TouristService.CACHE_KEY_ALL_TOURISTS, tourists);
-    }
-
-    @Test
-    void testGetTouristById_Cached_ReturnsCached() {
-        Tourist tourist = new Tourist();
-        tourist.setId(1L);
-        tourist.setName("John");
-        Optional<Tourist> cachedTourist = Optional.of(tourist);
-        when(simpleCache.get(TouristService.CACHE_KEY_TOURIST + 1L)).thenReturn(cachedTourist);
-
-        Optional<Tourist> result = touristService.getTouristById(1L);
-
-        assertNotNull(result);
-        assertEquals(cachedTourist, result);
         verifyNoInteractions(touristRepository);
     }
 
     @Test
-    void testGetTouristById_NotCached_ReturnsFromRepo() {
-        Tourist tourist = new Tourist();
-        tourist.setId(1L);
-        tourist.setName("John");
-        Optional<Tourist> optionalTourist = Optional.of(tourist);
-        when(touristRepository.findById(1L)).thenReturn(optionalTourist);
-        when(simpleCache.get(TouristService.CACHE_KEY_TOURIST + 1L)).thenReturn(null);
+    void shouldReturnFromRepoWhenGetAllTouristsNotCached() {
+        List<Tourist> tourists = Collections.emptyList();
+        when(touristRepository.findAll()).thenReturn(tourists);
+        when(simpleCache.get("all_tourists")).thenReturn(null);
+
+        List<Tourist> result = touristService.getAllTourists();
+
+        assertNotNull(result);
+        assertEquals(tourists, result);
+        verify(simpleCache).put("all_tourists", tourists);
+    }
+
+    @Test
+    void shouldReturnCachedWhenGetTouristByIdCached() {
+        Optional<Tourist> tourist = Optional.empty();
+        when(simpleCache.get("tourist_1")).thenReturn(tourist);
 
         Optional<Tourist> result = touristService.getTouristById(1L);
 
         assertNotNull(result);
-        assertEquals(optionalTourist, result);
-        verify(simpleCache).put(TouristService.CACHE_KEY_TOURIST + 1L, optionalTourist);
+        assertEquals(tourist, result);
+        verifyNoInteractions(touristRepository);
     }
 
     @Test
-    void testSaveTourist_UpdatesCache() {
-        Tourist tourist = new Tourist();
-        tourist.setName("John");
-        Tourist savedTourist = new Tourist();
-        savedTourist.setId(1L);
-        savedTourist.setName("John");
-        when(touristRepository.save(tourist)).thenReturn(savedTourist);
+    void shouldReturnFromRepoWhenGetTouristByIdNotCached() {
+        Optional<Tourist> tourist = Optional.empty();
+        when(touristRepository.findById(1L)).thenReturn(tourist);
+        when(simpleCache.get("tourist_1")).thenReturn(null);
+
+        Optional<Tourist> result = touristService.getTouristById(1L);
+
+        assertNotNull(result);
+        assertEquals(tourist, result);
+        verify(simpleCache).put("tourist_1", tourist);
+    }
+
+    @Test
+    void shouldReturnSavedTouristWhenSaveTourist() {
+        Tourist tourist = mock(Tourist.class);
+        when(touristRepository.save(any(Tourist.class))).thenReturn(tourist);
 
         Tourist result = touristService.saveTourist(tourist);
 
         assertNotNull(result);
-        assertEquals(savedTourist, result);
-        verify(simpleCache).put(TouristService.CACHE_KEY_ALL_TOURISTS, null);
-        verify(simpleCache).put(TouristService.CACHE_KEY_TOURIST + savedTourist.getId(), savedTourist);
+        assertEquals(tourist, result);
+        verify(simpleCache).put("all_tourists", null);
+        verify(simpleCache).put("tourist_" + tourist.getId(), tourist);
     }
 
     @Test
-    void testDeleteTourist_UpdatesCache() {
+    void shouldUpdateCacheWhenDeleteTourist() {
         touristService.deleteTourist(1L);
 
         verify(touristRepository).deleteById(1L);
-        verify(simpleCache).put(TouristService.CACHE_KEY_ALL_TOURISTS, null);
-        verify(simpleCache).put(TouristService.CACHE_KEY_TOURIST + 1L, null);
+        verify(simpleCache).put("all_tourists", null);
+        verify(simpleCache).put("tourist_1", null);
     }
 }
