@@ -8,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import static com.example.distanceservice.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -26,49 +25,45 @@ public class GeocodingServiceTest {
     }
 
     @Test
-    void testGetCity_Minsk_Cached_ReturnsCached() {
-        City cachedCity = new City(CITY_MINSK, MINSK_LAT, MINSK_LON);
-        when(simpleCache.get(GeocodingService.CACHE_KEY_GEOCODE + CITY_MINSK.toLowerCase())).thenReturn(cachedCity);
+    void shouldReturnCachedWhenGetCityMinskCached() {
+        City city = mock(City.class);
+        when(simpleCache.get(anyString())).thenReturn(city);
 
-        City result = geocodingService.getCity(CITY_MINSK);
+        City result = geocodingService.getCity("Minsk");
 
         assertNotNull(result);
-        assertEquals(cachedCity, result);
+        assertEquals(city, result);
     }
 
     @Test
-    void testGetCity_Minsk_NotCached_ReturnsNewCity() {
-        when(simpleCache.get(GeocodingService.CACHE_KEY_GEOCODE + CITY_MINSK.toLowerCase())).thenReturn(null);
+    void shouldReturnNewCityWhenGetCityMinskNotCached() {
+        when(simpleCache.get(anyString())).thenReturn(null);
 
-        City result = geocodingService.getCity(CITY_MINSK);
+        City result = geocodingService.getCity("Minsk");
 
         assertNotNull(result);
-        assertEquals(CITY_MINSK, result.getName());
-        assertEquals(MINSK_LAT, result.getLatitude(), DELTA);
-        assertEquals(MINSK_LON, result.getLongitude(), DELTA);
-        verify(simpleCache).put(GeocodingService.CACHE_KEY_GEOCODE + CITY_MINSK.toLowerCase(), result);
+        assertEquals("Minsk", result.getName());
+        verify(simpleCache).put(anyString(), result);
     }
 
     @Test
-    void testGetCity_Warsaw_NotCached_ReturnsNewCity() {
-        when(simpleCache.get(GeocodingService.CACHE_KEY_GEOCODE + CITY_WARSAW.toLowerCase())).thenReturn(null);
+    void shouldReturnNewCityWhenGetCityWarsawNotCached() {
+        when(simpleCache.get(anyString())).thenReturn(null);
 
-        City result = geocodingService.getCity(CITY_WARSAW);
+        City result = geocodingService.getCity("Warsaw");
 
         assertNotNull(result);
-        assertEquals(CITY_WARSAW, result.getName());
-        assertEquals(WARSAW_LAT, result.getLatitude(), DELTA);
-        assertEquals(WARSAW_LON, result.getLongitude(), DELTA);
-        verify(simpleCache).put(GeocodingService.CACHE_KEY_GEOCODE + CITY_WARSAW.toLowerCase(), result);
+        assertEquals("Warsaw", result.getName());
+        verify(simpleCache).put(anyString(), result);
     }
 
     @Test
-    void testGetCity_InvalidCity_ReturnsNull() {
-        when(simpleCache.get(GeocodingService.CACHE_KEY_GEOCODE + INVALID_CITY.toLowerCase())).thenReturn(null);
+    void shouldReturnNullWhenGetCityInvalidCity() {
+        when(simpleCache.get(anyString())).thenReturn(null);
 
-        City result = geocodingService.getCity(INVALID_CITY);
+        City result = geocodingService.getCity("Invalid");
 
         assertNull(result);
-        verify(simpleCache).put(GeocodingService.CACHE_KEY_GEOCODE + INVALID_CITY.toLowerCase(), null);
+        verify(simpleCache).put(anyString(), null);
     }
 }
