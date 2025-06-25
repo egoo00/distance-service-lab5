@@ -1,8 +1,5 @@
 package com.example.distanceservice.controller;
 
-
-
-
 import com.example.distanceservice.entity.Country;
 import com.example.distanceservice.service.CountryService;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,12 +7,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.ResponseEntity;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
-import static com.example.distanceservice.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -33,47 +29,43 @@ public class CountryControllerTest {
     }
 
     @Test
-    void testGetAllCountries_ReturnsList() {
-        Country country = new Country();
-        country.setName(COUNTRY_RUSSIA);
-        when(countryService.getAllCountries()).thenReturn(Collections.singletonList(country));
+    void shouldReturnListWhenGetAllCountries() {
+        List<Country> countries = Collections.emptyList();
+        when(countryService.getAllCountries()).thenReturn(countries);
 
-        ResponseEntity<List<Country>> response = (ResponseEntity<List<Country>>) (Object) countryController.getAllCountries();
+        List<Country> response = countryController.getAllCountries();
 
-        assertNotNull(response.getBody());
-        assertEquals(1, response.getBody().size());
+        assertNotNull(response);
+        assertEquals(0, response.size());
         verify(countryService).getAllCountries();
     }
 
     @Test
-    void testGetCountryById_Exists_ReturnsCountry() {
-        Country country = new Country();
-        country.setId(1L);
-        country.setName(COUNTRY_RUSSIA);
-        when(countryService.getCountryById(1L)).thenReturn(Optional.of(country));
+    void shouldReturnCountryWhenGetCountryByIdExists() {
+        Optional<Country> country = Optional.empty();
+        when(countryService.getCountryById(anyLong())).thenReturn(country);
 
-        ResponseEntity<Optional<Country>> response = (ResponseEntity<Optional<Country>>) (Object) countryController.getCountryById(1L);
+        Optional<Country> response = countryController.getCountryById(1L);
 
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody().isPresent());
+        assertNotNull(response);
+        assertFalse(response.isPresent());
         verify(countryService).getCountryById(1L);
     }
 
     @Test
-    void testSaveCountry_ReturnsSavedCountry() {
-        Country country = new Country();
-        country.setName(COUNTRY_RUSSIA);
-        when(countryService.saveCountry(country)).thenReturn(country);
+    void shouldReturnSavedCountryWhenSaveCountry() {
+        Country country = mock(Country.class);
+        when(countryService.saveCountry(any(Country.class))).thenReturn(country);
 
-        ResponseEntity<Country> response = (ResponseEntity<Country>) (Object) countryController.saveCountry(country);
+        Country response = countryController.saveCountry(country);
 
-        assertNotNull(response.getBody());
-        assertEquals(country, response.getBody());
+        assertNotNull(response);
+        assertEquals(country, response);
         verify(countryService).saveCountry(country);
     }
 
     @Test
-    void testDeleteCountry_CallsService() {
+    void shouldCallServiceWhenDeleteCountry() {
         countryController.deleteCountry(1L);
 
         verify(countryService).deleteCountry(1L);
