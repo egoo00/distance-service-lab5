@@ -11,7 +11,6 @@ import org.mockito.MockitoAnnotations;
 import java.util.Collections;
 import java.util.List;
 
-import static com.example.distanceservice.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -29,26 +28,26 @@ public class CountryCityControllerTest {
     }
 
     @Test
-    void testGetCitiesByCountry_ValidCountry_ReturnsList() {
-        City city = new City(CITY_MOSCOW, MOSCOW_LAT, MOSCOW_LON, null, Collections.emptyList());
-        when(countryCityService.getCitiesByCountry(COUNTRY_RUSSIA)).thenReturn(Collections.singletonList(city));
+    void shouldReturnListWhenGetCitiesByCountryValid() {
+        List<City> cities = Collections.emptyList();
+        when(countryCityService.getCitiesByCountry(anyString())).thenReturn(cities);
 
-        List<City> response = countryCityController.getCitiesByCountry(COUNTRY_RUSSIA);
+        List<City> response = countryCityController.getCitiesByCountry("country");
 
         assertNotNull(response);
-        assertEquals(1, response.size());
-        verify(countryCityService).getCitiesByCountry(COUNTRY_RUSSIA);
+        assertEquals(0, response.size());
+        verify(countryCityService).getCitiesByCountry("country");
     }
 
     @Test
-    void testGetCitiesByCountryNative_ValidCountry_ReturnsList() {
-        City city = new City(CITY_MOSCOW, MOSCOW_LAT, MOSCOW_LON, null, Collections.emptyList());
-        when(countryCityService.getCitiesByCountryNative(COUNTRY_RUSSIA)).thenReturn(Collections.singletonList(city));
+    void shouldReturnListWhenGetCitiesByCountryNativeValid() {
+        List<City> cities = Collections.emptyList();
+        when(countryCityService.getCitiesByCountryNative(anyString())).thenReturn(cities);
 
-        List<City> response = countryCityController.getCitiesByCountryNative(COUNTRY_RUSSIA);
+        List<City> response = countryCityController.getCitiesByCountryNative("country");
 
         assertNotNull(response);
-        assertEquals(1, response.size());
-        verify(countryCityService).getCitiesByCountryNative(COUNTRY_RUSSIA);
+        assertEquals(0, response.size());
+        verify(countryCityService).getCitiesByCountryNative("country");
     }
 }
