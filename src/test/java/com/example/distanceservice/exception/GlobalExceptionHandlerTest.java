@@ -7,7 +7,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static com.example.distanceservice.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GlobalExceptionHandlerTest {
@@ -21,24 +20,24 @@ public class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void testHandleCityNotFoundException_ReturnsBadRequest() {
+    void shouldReturnBadRequestWhenHandleCityNotFoundException() {
         CityNotFoundException exception = new CityNotFoundException("City not found");
 
         ResponseEntity<String> response = globalExceptionHandler.handleCityNotFoundException(exception);
 
         assertNotNull(response);
-        assertEquals(BAD_REQUEST_STATUS, response.getStatusCode());
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals("City not found", response.getBody());
     }
 
     @Test
-    void testHandleGeneralException_ReturnsInternalServerError() {
+    void shouldReturnInternalServerErrorWhenHandleGeneralException() {
         Exception exception = new Exception("Test error");
 
         ResponseEntity<String> response = globalExceptionHandler.handleGeneralException(exception);
 
         assertNotNull(response);
-        assertEquals(INTERNAL_SERVER_ERROR_STATUS, response.getStatusCode());
-        assertEquals(UNEXPECTED_ERROR_MESSAGE + "Test error", response.getBody());
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertEquals("An unexpected error occurred: Test error", response.getBody());
     }
 }
