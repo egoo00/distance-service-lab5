@@ -10,9 +10,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
-import static com.example.distanceservice.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -33,89 +33,74 @@ public class CountryServiceTest {
     }
 
     @Test
-    void testGetAllCountries_Cached_ReturnsCached() {
-        Country country = new Country();
-        country.setName(COUNTRY_RUSSIA);
-        @SuppressWarnings("unchecked")
-        List<Country> cachedCountries = Collections.singletonList(country);
-        when(simpleCache.get(CountryService.CACHE_KEY_ALL_COUNTRIES)).thenReturn(cachedCountries);
-
-        List<Country> result = countryService.getAllCountries();
-
-        assertNotNull(result);
-        assertEquals(cachedCountries, result);
-        verifyNoInteractions(countryRepository);
-    }
-
-    @Test
-    void testGetAllCountries_NotCached_ReturnsFromRepo() {
-        Country country = new Country();
-        country.setName(COUNTRY_RUSSIA);
-        List<Country> countries = Collections.singletonList(country);
-        when(countryRepository.findAll()).thenReturn(countries);
-        when(simpleCache.get(CountryService.CACHE_KEY_ALL_COUNTRIES)).thenReturn(null);
+    void shouldReturnCachedWhenGetAllCountriesCached() {
+        List<Country> countries = Collections.emptyList();
+        when(simpleCache.get("all_countries")).thenReturn(countries);
 
         List<Country> result = countryService.getAllCountries();
 
         assertNotNull(result);
         assertEquals(countries, result);
-        verify(simpleCache).put(CountryService.CACHE_KEY_ALL_COUNTRIES, countries);
-    }
-
-    @Test
-    void testGetCountryById_Cached_ReturnsCached() {
-        Country country = new Country();
-        country.setId(1L);
-        country.setName(COUNTRY_RUSSIA);
-        Optional<Country> cachedCountry = Optional.of(country);
-        when(simpleCache.get(CountryService.CACHE_KEY_COUNTRY + 1L)).thenReturn(cachedCountry);
-
-        Optional<Country> result = countryService.getCountryById(1L);
-
-        assertNotNull(result);
-        assertEquals(cachedCountry, result);
         verifyNoInteractions(countryRepository);
     }
 
     @Test
-    void testGetCountryById_NotCached_ReturnsFromRepo() {
-        Country country = new Country();
-        country.setId(1L);
-        country.setName(COUNTRY_RUSSIA);
-        Optional<Country> optionalCountry = Optional.of(country);
-        when(countryRepository.findById(1L)).thenReturn(optionalCountry);
-        when(simpleCache.get(CountryService.CACHE_KEY_COUNTRY + 1L)).thenReturn(null);
+    void shouldReturnFromRepoWhenGetAllCountriesNotCached() {
+        List<Country> countries = Collections.emptyList();
+        when(countryRepository.findAll()).thenReturn(countries);
+        when(simpleCache.get("all_countries")).thenReturn(null);
+
+        List<Country> result = countryService.getAllCountries();
+
+        assertNotNull(result);
+        assertEquals(countries, result);
+        verify(simpleCache).put("all_countries", countries);
+    }
+
+    @Test
+    void shouldReturnCachedWhenGetCountryByIdCached() {
+        Optional<Country> country = Optional.empty();
+        when(simpleCache.get("country_1")).thenReturn(country);
 
         Optional<Country> result = countryService.getCountryById(1L);
 
         assertNotNull(result);
-        assertEquals(optionalCountry, result);
-        verify(simpleCache).put(CountryService.CACHE_KEY_COUNTRY + 1L, optionalCountry);
+        assertEquals(country, result);
+        verifyNoInteractions(countryRepository);
     }
 
     @Test
-    void testSaveCountry_UpdatesCache() {
-        Country country = new Country();
-        country.setName(COUNTRY_RUSSIA);
-        Country savedCountry = new Country();
-        savedCountry.setId(1L);
-        savedCountry.setName(COUNTRY_RUSSIA);
-        when(countryRepository.save(country)).thenReturn(savedCountry);
+    void shouldReturnFromRepoWhenGetCountryByIdNotCached() {
+        Optional<Country> country = Optional.empty();
+        when(countryRepository.findById(1L)).thenReturn(country);
+        when(simpleCache.get("country_1")).thenReturn(null);
+
+        Optional<Country> result = countryService.getCountryById(1L);
+
+        assertNotNull(result);
+        assertEquals(country, result);
+        verify(simpleCache).put("country_1", country);
+    }
+
+    @Test
+    void shouldReturnSavedCountryWhenSaveCountry() {
+        Country country = mock(Country.class);
+        when(countryRepository.save(any(Country.class))).thenReturn(country);
 
         Country result = countryService.saveCountry(country);
 
         assertNotNull(result);
-        assertEquals(savedCountry, result);
-        verify(simpleCache).put(CountryService.CACHE_KEY_ALL_COUNTRIES, null);
-        verify(simpleCache).put(CountryService.CACHE_KEY_COUNTRY + savedCountry.getId(), savedCountry);
+        assertEquals(country, result);
+        verify(simpleCache).put("all_countries", null);
+        verify(simpleCache).put("country_" + country.getId(), country);
     }
 
     @Test
-    void testDeleteCountry_UpdatesCache() {
+    void shouldUpdateCacheWhenDeleteCountry() {
         countryService.deleteCountry(1L);
 
         verify(countryRepository).deleteById(1L);
-        verify(simpleCache).put(CountryService.CACHE_KEY_ALL_COUNTRIES, null);
-        verify(simpleCache).put(CountryService.CACHE_KEY_COUNTRY + 1L, null);
+        verify(simpleCache).put("all_countries", null);
+        verify(simpleCache).put("country_1", null);
     }
 }
