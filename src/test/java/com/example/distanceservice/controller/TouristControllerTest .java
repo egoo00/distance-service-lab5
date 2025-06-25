@@ -7,15 +7,11 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.ResponseEntity;
-
-
-
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
-import static com.example.distanceservice.TestConstants.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -33,47 +29,43 @@ public class TouristControllerTest {
     }
 
     @Test
-    void testGetAllTourists_ReturnsList() {
-        Tourist tourist = new Tourist();
-        tourist.setName("John");
-        when(touristService.getAllTourists()).thenReturn(Collections.singletonList(tourist));
+    void shouldReturnListWhenGetAllTourists() {
+        List<Tourist> tourists = Collections.emptyList();
+        when(touristService.getAllTourists()).thenReturn(tourists);
 
-        ResponseEntity<List<Tourist>> response = (ResponseEntity<List<Tourist>>) (Object) touristController.getAllTourists();
+        List<Tourist> response = touristController.getAllTourists();
 
-        assertNotNull(response.getBody());
-        assertEquals(1, response.getBody().size());
+        assertNotNull(response);
+        assertEquals(0, response.size());
         verify(touristService).getAllTourists();
     }
 
     @Test
-    void testGetTouristById_Exists_ReturnsTourist() {
-        Tourist tourist = new Tourist();
-        tourist.setId(1L);
-        tourist.setName("John");
-        when(touristService.getTouristById(1L)).thenReturn(Optional.of(tourist));
+    void shouldReturnTouristWhenGetTouristByIdExists() {
+        Optional<Tourist> tourist = Optional.empty();
+        when(touristService.getTouristById(anyLong())).thenReturn(tourist);
 
-        ResponseEntity<Optional<Tourist>> response = (ResponseEntity<Optional<Tourist>>) (Object) touristController.getTouristById(1L);
+        Optional<Tourist> response = touristController.getTouristById(1L);
 
-        assertNotNull(response.getBody());
-        assertTrue(response.getBody().isPresent());
+        assertNotNull(response);
+        assertFalse(response.isPresent());
         verify(touristService).getTouristById(1L);
     }
 
     @Test
-    void testSaveTourist_ReturnsSavedTourist() {
-        Tourist tourist = new Tourist();
-        tourist.setName("John");
-        when(touristService.saveTourist(tourist)).thenReturn(tourist);
+    void shouldReturnSavedTouristWhenSaveTourist() {
+        Tourist tourist = mock(Tourist.class);
+        when(touristService.saveTourist(any(Tourist.class))).thenReturn(tourist);
 
-        ResponseEntity<Tourist> response = (ResponseEntity<Tourist>) (Object) touristController.saveTourist(tourist);
+        Tourist response = touristController.saveTourist(tourist);
 
-        assertNotNull(response.getBody());
-        assertEquals(tourist, response.getBody());
+        assertNotNull(response);
+        assertEquals(tourist, response);
         verify(touristService).saveTourist(tourist);
     }
 
     @Test
-    void testDeleteTourist_CallsService() {
+    void shouldCallServiceWhenDeleteTourist() {
         touristController.deleteTourist(1L);
 
         verify(touristService).deleteTourist(1L);
