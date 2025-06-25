@@ -10,9 +10,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.Collections;
-
-import static com.example.distanceservice.TestConstants.*;
 import static org.mockito.Mockito.*;
 
 public class DataLoaderTest {
@@ -32,11 +29,11 @@ public class DataLoaderTest {
     }
 
     @Test
-    void testRun_LoadsData() {
+    void shouldLoadDataWhenRun() {
         dataLoader.run();
 
-        verify(countryRepository).save(argThat(country -> COUNTRY_RUSSIA.equals(country.getName())));
-        verify(cityRepository).save(argThat(city -> CITY_MOSCOW.equals(city.getName()) && MOSCOW_LAT == city.getLatitude() && MOSCOW_LON == city.getLongitude()));
-        verify(cityRepository).save(argThat(city -> CITY_LONDON.equals(city.getName()) && LONDON_LAT == city.getLatitude() && LONDON_LON == city.getLongitude()));
+        verify(countryRepository).save(argThat(country -> "Russia".equals(country.getName())));
+        verify(cityRepository).save(argThat(city -> "Moscow".equals(city.getName()) && 55.7558 == city.getLatitude() && 37.6173 == city.getLongitude()));
+        verify(cityRepository).save(argThat(city -> "London".equals(city.getName()) && 51.5074 == city.getLatitude() && -0.1278 == city.getLongitude()));
     }
 }
